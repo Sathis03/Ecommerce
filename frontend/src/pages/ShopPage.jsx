@@ -186,7 +186,8 @@ const ShopPage = () => {
                                 <p>{error}</p>
                                 <p style={{ fontSize: '0.9rem', marginTop: '1rem', color: 'var(--text-muted)' }}>
                                     API URL: {axios.defaults.baseURL}<br />
-                                    Make sure your backend is running and CORS is configured.
+                                    Frontend Origin: {window.location.origin}<br />
+                                    Make sure your backend is running and CORS is configured for this origin.
                                 </p>
                             </div>
                         ) : products.length === 0 ? (

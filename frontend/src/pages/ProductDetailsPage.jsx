@@ -53,6 +53,7 @@ const ProductDetailsPage = () => {
             <p>{error}</p>
             <p style={{ fontSize: '0.9rem', marginTop: '1rem', color: 'var(--text-muted)' }}>
                 API URL: {axios.defaults.baseURL}<br />
+                Frontend Origin: {window.location.origin}<br />
                 Make sure your backend is running.
             </p>
             <button onClick={() => navigate('/products')} className="btn btn-primary" style={{ marginTop: '1.5rem' }}>Back to Shop</button>
