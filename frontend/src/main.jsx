@@ -8,7 +8,11 @@ import './index.css'
 import { store } from './redux/store'
 
 // Configure Axios
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+if (apiUrl.endsWith('/')) {
+    apiUrl = apiUrl.slice(0, -1);
+}
+axios.defaults.baseURL = apiUrl;
 axios.defaults.withCredentials = true;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
