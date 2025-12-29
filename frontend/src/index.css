@@ -1,25 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
   --primary: #0f172a;
-  /* slate-900 */
   --primary-light: #334155;
-  /* slate-700 */
   --secondary: #3b82f6;
-  /* blue-500 */
   --accent: #f59e0b;
-  /* amber-500 */
   --accent-hover: #d97706;
-  /* amber-600 */
   --background: #f8fafc;
-  /* slate-50 */
   --surface: #ffffff;
   --text-main: #1e293b;
-  /* slate-800 */
   --text-muted: #64748b;
-  /* slate-500 */
   --border: #e2e8f0;
-  /* slate-200 */
 
   --radius: 0.5rem;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -38,6 +29,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
+  overflow-x: hidden;
 }
 
 *,
@@ -81,6 +73,7 @@ button {
   font-weight: 600;
   transition: var(--transition);
   font-size: 0.95rem;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -101,4 +94,78 @@ button {
 .btn-accent:hover {
   background-color: var(--accent-hover);
   transform: translateY(-1px);
+}
+
+/* Responsive Grid Utilities */
+.grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 640px) {
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Flex Stack on Mobile Utility */
+.flex-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .flex-stack {
+    flex-direction: row;
+  }
+}
+
+/* Responsive Hide */
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .show-mobile {
+    display: none !important;
+  }
 }
