@@ -20,14 +20,18 @@ const ProductDetailsPage = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const [error, setError] = useState(null);
     useEffect(() => {
         const fetchProduct = async () => {
             try {
+                setLoading(true);
                 const { data } = await axios.get(`/api/products/${id}`);
                 setProduct(data);
                 setLoading(false);
+                setError(null);
             } catch (error) {
                 console.error('Error fetching product:', error);
+                setError(error.message || 'Failed to fetch product details');
                 setLoading(false);
             }
         };
@@ -42,6 +46,18 @@ const ProductDetailsPage = () => {
     };
 
     if (loading) return <div className="container" style={{ padding: '5rem 0' }}>Loading...</div>;
+
+    if (error) return (
+        <div className="container" style={{ padding: '5rem 0', textAlign: 'center' }}>
+            <h2 style={{ color: '#ef4444' }}>Connection Error</h2>
+            <p>{error}</p>
+            <p style={{ fontSize: '0.9rem', marginTop: '1rem', color: 'var(--text-muted)' }}>
+                API URL: {axios.defaults.baseURL}<br />
+                Make sure your backend is running.
+            </p>
+            <button onClick={() => navigate('/products')} className="btn btn-primary" style={{ marginTop: '1.5rem' }}>Back to Shop</button>
+        </div>
+    );
 
     if (!product) return (
         <div className="container" style={{ padding: '5rem 0', textAlign: 'center' }}>

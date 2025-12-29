@@ -95,6 +95,7 @@ const ProductCard = ({ product }) => {
 const ShopPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const location = useLocation();
     const navigate = useNavigate();
     const queryParams = new URLSearchParams(location.search);
@@ -104,6 +105,7 @@ const ShopPage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+                setLoading(true);
                 const { data } = await axios.get('/api/products');
                 let filteredProducts = data;
 
@@ -120,8 +122,10 @@ const ShopPage = () => {
 
                 setProducts(filteredProducts);
                 setLoading(false);
+                setError(null);
             } catch (error) {
                 console.error('Error fetching products:', error);
+                setError(error.message || 'Failed to fetch products');
                 setLoading(false);
             }
         };
@@ -176,7 +180,16 @@ const ShopPage = () => {
 
                     {/* Product Grid */}
                     <div style={{ flex: 1 }}>
-                        {products.length === 0 ? (
+                        {error ? (
+                            <div style={{ textAlign: 'center', padding: '5rem 0', color: '#ef4444' }}>
+                                <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1rem' }}>Connection Error</h2>
+                                <p>{error}</p>
+                                <p style={{ fontSize: '0.9rem', marginTop: '1rem', color: 'var(--text-muted)' }}>
+                                    API URL: {axios.defaults.baseURL}<br />
+                                    Make sure your backend is running and CORS is configured.
+                                </p>
+                            </div>
+                        ) : products.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '5rem 0', color: 'var(--text-muted)' }}>
                                 <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1rem' }}>No Products Found</h2>
                                 <p>Try checking your database connection or running the seeder.</p>

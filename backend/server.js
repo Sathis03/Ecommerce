@@ -65,6 +65,22 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/ecommerce',
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 
+// Debugging Routes
+app.get('/api/test', async (req, res) => {
+    try {
+        const count = await Product.countDocuments();
+        res.json({
+            status: 'success',
+            database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+            productCount: count,
+            environment: process.env.NODE_ENV || 'development',
+            mongoUriSet: !!process.env.MONGO_URI
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+});
+
 // Helper Route
 app.get('/', (req, res) => {
     res.send('API is running...');
