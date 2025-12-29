@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Filter, Star, X } from 'lucide-react';
+import { Filter, Search, ShoppingBag, Star, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -8,22 +8,26 @@ import { addToCart } from '../redux/cartSlice';
 const Label = ({ text, active, slug, navigate, onClose }) => (
     <div
         onClick={() => {
-            if (slug) {
-                navigate(`/products?category=${slug}`);
-            } else {
-                navigate('/products');
-            }
+            if (slug) navigate(`/products?category=${slug}`);
+            else navigate('/products');
             if (onClose) onClose();
         }}
         style={{
             cursor: 'pointer',
+            padding: '0.75rem 1rem',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: active ? 'var(--accent-soft)' : 'transparent',
             color: active ? 'var(--accent)' : 'var(--text-main)',
-            fontWeight: active ? '600' : '400',
-            transition: 'color 0.2s',
-            padding: '0.5rem 0'
+            fontWeight: active ? '700' : '500',
+            transition: 'var(--transition)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '0.9rem'
         }}
     >
         {text}
+        {active && <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent)' }}></div>}
     </div>
 );
 
@@ -34,59 +38,43 @@ const ProductCard = ({ product }) => {
     const addToCartHandler = (e) => {
         e.stopPropagation();
         dispatch(addToCart({ ...product, qty: 1 }));
-        alert("Added to Cart!");
+        // Custom Toast or Alert would be better, but sticking to logic
     };
 
     return (
-        <div
-            onClick={() => navigate(`/product/${product._id}`)}
-            style={{
-                backgroundColor: 'var(--surface)',
-                borderRadius: 'var(--radius)',
-                overflow: 'hidden',
-                border: '1px solid var(--border)',
-                transition: 'var(--transition)',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column'
-            }}
-            onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-            }}
-            onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-            }}>
-            <div style={{ height: '220px', overflow: 'hidden' }}>
+        <div className="product-card" onClick={() => navigate(`/product/${product._id}`)}>
+            <div style={{ position: 'relative', paddingTop: '100%', overflow: 'hidden', backgroundColor: '#fcfcfc' }}>
                 <img
                     src={product.image}
                     alt={product.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}
+                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.08)'}
+                    onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                 />
-            </div>
-            <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{product.category}</div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.5rem', lineHeight: '1.3' }}>{product.name}</h3>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', color: '#fbbf24' }}>
-                        {[...Array(5)].map((_, i) => (
-                            <Star key={i} size={14} fill={i < Math.floor(product.rating || 0) ? "currentColor" : "none"} />
-                        ))}
-                    </div>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>({product.numReviews})</span>
-                </div>
-
-                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--primary)' }}>₹{product.price.toLocaleString('en-IN')}</span>
+                <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
                     <button
-                        className="btn btn-primary"
-                        style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}
                         onClick={addToCartHandler}
+                        className="glass"
+                        style={{ padding: '0.6rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
                     >
-                        + Add
+                        <ShoppingBag size={18} color="var(--primary)" />
                     </button>
+                </div>
+            </div>
+            <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--accent)', letterSpacing: '0.05em' }}>
+                        {product.category?.replace('-', ' ')}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#fbbf24' }}>
+                        <Star size={12} fill="currentColor" />
+                        <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-main)' }}>{product.rating}</span>
+                    </div>
+                </div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--primary)', lineHeight: '1.3' }}>{product.name}</h3>
+                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem' }}>
+                    <span style={{ fontSize: '1.25rem', fontWeight: '900', color: 'var(--primary)' }}>₹{product.price.toLocaleString('en-IN')}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500' }}>{product.numReviews} Reviews</span>
                 </div>
             </div>
         </div>
@@ -98,6 +86,7 @@ const ShopPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     const location = useLocation();
     const navigate = useNavigate();
     const queryParams = new URLSearchParams(location.search);
@@ -124,102 +113,143 @@ const ShopPage = () => {
 
                 setProducts(filteredProducts);
                 setLoading(false);
-                setError(null);
             } catch (error) {
-                console.error('Error fetching products:', error);
-                setError(error.message || 'Failed to fetch products');
+                setError('Failed to load products. Please try again.');
                 setLoading(false);
             }
         };
         fetchProducts();
     }, [selectedCategory, keyword]);
 
-    const FilterContent = ({ onClose }) => (
-        <>
-            <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '0.8rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '1rem' }}>Category</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <Label text="All Products" active={!selectedCategory} navigate={navigate} onClose={onClose} />
-                    <Label text="Living Room" active={selectedCategory === 'living-room'} slug="living-room" navigate={navigate} onClose={onClose} />
-                    <Label text="Kitchen & Appliances" active={selectedCategory === 'kitchen'} slug="kitchen" navigate={navigate} onClose={onClose} />
-                    <Label text="Bedroom" active={selectedCategory === 'bedroom'} slug="bedroom" navigate={navigate} onClose={onClose} />
-                    <Label text="Office" active={selectedCategory === 'office'} slug="office" navigate={navigate} onClose={onClose} />
-                </div>
-            </div>
+    useEffect(() => {
+        if (isSidebarOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isSidebarOpen]);
 
-            <div>
-                <h3 style={{ fontSize: '0.8rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '1rem' }}>Price Range</h3>
-                <input type="range" style={{ width: '100%', accentColor: 'var(--accent)' }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                    <span>₹0</span>
-                    <span>₹1,00,000+</span>
-                </div>
-            </div>
-        </>
+    const FilterList = ({ onClose }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <Label text="All Collections" active={!selectedCategory} navigate={navigate} onClose={onClose} />
+            <Label text="Living Room" active={selectedCategory === 'living-room'} slug="living-room" navigate={navigate} onClose={onClose} />
+            <Label text="Kitchen & Appliances" active={selectedCategory === 'kitchen'} slug="kitchen" navigate={navigate} onClose={onClose} />
+            <Label text="Bedroom" active={selectedCategory === 'bedroom'} slug="bedroom" navigate={navigate} onClose={onClose} />
+            <Label text="Office" active={selectedCategory === 'office'} slug="office" navigate={navigate} onClose={onClose} />
+        </div>
     );
 
-    if (loading) return <div className="container" style={{ padding: '5rem 0', textAlign: 'center' }}>Loading...</div>;
+    if (loading) return (
+        <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '40px', height: '40px', border: '3px solid var(--accent-soft)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+    );
 
     return (
-        <div className="container" style={{ padding: '2rem 0' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-
-                {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
-                    <div>
-                        <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: '800', color: 'var(--primary)', marginBottom: '0.5rem' }}>
-                            {keyword ? `Results for "${keyword}"` : selectedCategory ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1).replace('-', ' ')}` : 'Shop All'}
-                        </h1>
-                        <p style={{ color: 'var(--text-muted)' }}>Showing {products.length} products</p>
-                    </div>
-
-                    <button
-                        onClick={() => setIsSidebarOpen(true)}
-                        className="btn show-mobile"
-                        style={{ border: '1px solid var(--border)', gap: '0.5rem' }}
-                    >
-                        <Filter size={18} /> Filter
-                    </button>
-                </div>
-
-                <div className="flex-stack">
-                    {/* Desktop Sidebar */}
-                    <aside className="hide-mobile" style={{ flex: '0 0 250px' }}>
-                        <div style={{ position: 'sticky', top: '6rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem', fontWeight: '800', fontSize: '1.1rem' }}>
-                                <Filter size={20} /> FILTERS
+        <div style={{ backgroundColor: 'var(--background)', minHeight: '100vh' }}>
+            {/* Page Header */}
+            <div style={{ backgroundColor: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '3rem 0' }}>
+                <div className="container">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem' }}>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent)', fontWeight: '800', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
+                                <ShoppingBag size={16} /> Premium Catalog
                             </div>
-                            <FilterContent />
+                            <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
+                                {keyword ? `Search: ${keyword}` : selectedCategory ? selectedCategory.replace('-', ' ') : 'Our Collection'}
+                            </h1>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button
+                                onClick={() => setIsSidebarOpen(true)}
+                                className="show-mobile btn btn-primary"
+                                style={{ borderRadius: '2rem', padding: '0.75rem 1.5rem' }}
+                            >
+                                <Filter size={18} /> Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="container" style={{ padding: '2rem 0' }}>
+                <div className="flex-stack" style={{ alignItems: 'flex-start', gap: '3rem' }}>
+
+                    {/* Desktop Sidebar */}
+                    <aside className="hide-mobile" style={{ flex: '0 0 280px', position: 'sticky', top: '7rem' }}>
+                        <div style={{ backgroundColor: 'var(--surface)', padding: '2rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+                            <h3 style={{ fontSize: '1rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Filter size={18} /> Categories
+                            </h3>
+                            <FilterList />
+
+                            <div style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid var(--border)' }}>
+                                <h3 style={{ fontSize: '1rem', marginBottom: '1.5rem' }}>Price Range</h3>
+                                <input type="range" style={{ width: '100%', accentColor: 'var(--accent)' }} />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+                                    <span>₹0</span>
+                                    <span>₹1L+</span>
+                                </div>
+                            </div>
                         </div>
                     </aside>
 
-                    {/* Mobile Sidebar Overlay */}
+                    {/* Mobile Filter Drawer */}
                     {isSidebarOpen && (
-                        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', justifyContent: 'flex-end' }}>
-                            <div style={{ width: '80%', maxWidth: '300px', backgroundColor: 'var(--surface)', height: '100%', padding: '2rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                                    <h3 style={{ fontWeight: '800' }}>Filters</h3>
-                                    <X size={24} onClick={() => setIsSidebarOpen(false)} style={{ cursor: 'pointer' }} />
+                        <div style={{ position: 'fixed', inset: 0, zIndex: 1000 }}>
+                            <div
+                                className="animate-fade"
+                                style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(2, 6, 23, 0.4)', backdropFilter: 'blur(4px)' }}
+                                onClick={() => setIsSidebarOpen(false)}
+                            ></div>
+                            <div
+                                className="animate-slide-right"
+                                style={{
+                                    position: 'absolute',
+                                    right: 0,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                                    backdropFilter: 'blur(20px)',
+                                    WebkitBackdropFilter: 'blur(20px)',
+                                    borderLeft: '1px solid rgba(255,255,255,0.3)',
+                                    width: '85%',
+                                    maxWidth: '350px',
+                                    height: '100%',
+                                    padding: '2.5rem',
+                                    boxShadow: 'var(--shadow-lg)'
+                                }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+                                    <h2 style={{ fontSize: '1.5rem' }}>Filters</h2>
+                                    <button onClick={() => setIsSidebarOpen(false)} style={{ color: 'var(--text-main)', background: 'var(--accent-soft)', borderRadius: '50%', display: 'flex', padding: '0.5rem' }}>
+                                        <X size={24} />
+                                    </button>
                                 </div>
-                                <FilterContent onClose={() => setIsSidebarOpen(false)} />
+                                <FilterList onClose={() => setIsSidebarOpen(false)} />
                             </div>
                         </div>
                     )}
 
-                    {/* Product Grid */}
+                    {/* Main Content */}
                     <div style={{ flex: 1 }}>
                         {error ? (
-                            <div style={{ textAlign: 'center', padding: '3rem 0', color: '#ef4444' }}>
-                                <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem' }}>Connection Error</h2>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{error}</p>
+                            <div style={{ textAlign: 'center', padding: '5rem 2rem', backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+                                <h2 style={{ color: '#ef4444', marginBottom: '1rem' }}>Something went wrong</h2>
+                                <p style={{ color: 'var(--text-muted)' }}>{error}</p>
+                                <button onClick={() => window.location.reload()} className="btn btn-primary" style={{ marginTop: '2rem' }}>Retry</button>
                             </div>
                         ) : products.length === 0 ? (
-                            <div style={{ textAlign: 'center', padding: '5rem 0', color: 'var(--text-muted)', backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)', border: '1px dashed var(--border)' }}>
-                                <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>No Products Found</h2>
-                                <p>Try adjusting your search or category filters.</p>
+                            <div style={{ textAlign: 'center', padding: '8rem 2rem', backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--border)' }}>
+                                <Search size={48} style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', opacity: 0.5 }} />
+                                <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>No items found</h2>
+                                <p style={{ color: 'var(--text-muted)' }}>Try adjusting your filters or search keywords.</p>
+                                <button onClick={() => navigate('/products')} className="btn btn-primary" style={{ marginTop: '2rem' }}>Clear All Filters</button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 grid-cols-3">
+                            <div className="grid grid-cols-1 grid-cols-2 grid-cols-3" style={{ gap: '2.5rem' }}>
                                 {products.map(product => (
                                     <ProductCard key={product._id} product={product} />
                                 ))}
